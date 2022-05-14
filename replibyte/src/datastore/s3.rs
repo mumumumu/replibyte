@@ -363,13 +363,22 @@ fn create_bucket<'a>(client: &Client, bucket: &'a str, region: &str) -> Result<(
         return Ok(());
     }
 
-    let result = block_on(
-        client
-            .create_bucket()
-            .create_bucket_configuration(cfg)
-            .bucket(bucket)
-            .send(),
-    );
+    let result = if region == "us-east-1" {
+        block_on(
+            client
+                .create_bucket()
+                .bucket(bucket)
+                .send(),
+        )
+    } else {
+        block_on(
+            client
+                .create_bucket()
+                .create_bucket_configuration(cfg)
+                .bucket(bucket)
+                .send(),
+        )
+    };
 
     match result {
         Ok(_) => {}
